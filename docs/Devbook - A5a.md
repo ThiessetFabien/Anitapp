@@ -5,7 +5,7 @@
 2. [Architecture par feature](#2-architecture-par-feature)
 3. [Configuration de l'environnement](#3-configuration-de-lenvironnement)
 4. [Méthodologie TDD](#4-méthodologie-tdd)
-5. [Qualité du code (ESLint/Prettier)](#5-qualité-du-code-eslintprettier)
+5. [Qualité du code (Oxlint/Prettier)](#5-qualité-du-code-oxlintprettier)
 6. [Gestion des commits (Commitlint)](#6-gestion-des-commits-commitlint)
 7. [Implémentation des features](#7-implémentation-des-features)
 8. [Interfaces et types TypeScript](#8-interfaces-et-types-typescript)
@@ -303,7 +303,7 @@ export * from './utils';
 node --version
 
 # React Native CLI
-npm install -g @react-native-community/cli
+pnpm add -g @react-native-community/cli
 
 # Android Studio + SDK
 # Java JDK 11+
@@ -317,27 +317,25 @@ npx react-native init A5aLauncher --template react-native-template-typescript
 # Navigation vers le projet
 cd A5aLauncher
 
-# Installation des dépendances de développement (ESLint/Prettier)
-npm install --save-dev @typescript-eslint/eslint-plugin @typescript-eslint/parser
-npm install --save-dev eslint-plugin-react eslint-plugin-react-hooks
-npm install --save-dev eslint-plugin-react-native
-npm install --save-dev prettier eslint-config-prettier eslint-plugin-prettier
-npm install --save-dev @commitlint/config-conventional @commitlint/cli
-npm install --save-dev husky lint-staged
+# Installation des dépendances de développement (Oxlint/Prettier)
+pnpm add -D oxlint
+pnpm add -D prettier
+pnpm add -D @commitlint/config-conventional @commitlint/cli
+pnpm add -D husky lint-staged
 
 # Installation des dépendances de test
-npm install --save-dev jest @testing-library/react-native
-npm install --save-dev @testing-library/jest-native
+pnpm add -D jest @testing-library/react-native
+pnpm add -D @testing-library/jest-native
 
 # Installation des dépendances spécifiques
-npm install nativewind
-npm install --save-dev tailwindcss
-npm install react-native-contacts
-npm install @react-native-async-storage/async-storage
-npm install react-native-orientation-locker
-npm install react-native-send-intent
-npm install crypto-js
-npm install react-native-vector-icons
+pnpm add nativewind
+pnpm add -D tailwindcss
+pnpm add react-native-contacts
+pnpm add @react-native-async-storage/async-storage
+pnpm add react-native-orientation-locker
+pnpm add react-native-send-intent
+pnpm add crypto-js
+pnpm add react-native-vector-icons
 ```
 
 ### 3.3 Configuration NativeWind
@@ -559,52 +557,41 @@ describe('ContactButton', () => {
 
 ---
 
-## 5. Qualité du code (ESLint/Prettier)
+## 5. Qualité du code (Oxlint/Prettier)
 
-### 5.1 Configuration ESLint
+### 5.1 Configuration Oxlint
 ```javascript
-// .eslintrc.js
+// oxlint.config.js
 module.exports = {
-  root: true,
-  extends: [
-    '@react-native-community',
-    '@typescript-eslint/recommended',
-    'prettier',
-  ],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react-hooks', 'react-native'],
   rules: {
     // TypeScript
-    '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/explicit-function-return-type': 'warn',
-    '@typescript-eslint/no-explicit-any': 'error',
+    'no-unused-vars': 'error',
+    'no-explicit-any': 'error',
+    'prefer-const': 'error',
     
     // React
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    'react/jsx-boolean-value': ['error', 'never'],
-    'react/jsx-curly-brace-presence': ['error', 'never'],
+    'react/jsx-boolean-value': 'error',
+    'react/jsx-curly-brace-presence': 'error',
     
     // React Native
     'react-native/no-unused-styles': 'error',
-    'react-native/split-platform-components': 'error',
     'react-native/no-inline-styles': 'warn',
     'react-native/no-raw-text': 'error',
     
-    // Général
-    'prefer-const': 'error',
+    // Performance
     'no-var': 'error',
     'object-shorthand': 'error',
     'prefer-arrow-callback': 'error',
   },
-  overrides: [
-    {
-      files: ['*.test.ts', '*.test.tsx'],
-      rules: {
-        '@typescript-eslint/no-explicit-any': 'off',
-      },
-    },
-  ],
+  ignore: [
+    'node_modules/**',
+    'android/**',
+    'ios/**',
+    '*.test.ts',
+    '*.test.tsx'
+  ]
 };
 ```
 
@@ -629,13 +616,13 @@ module.exports = {
 // package.json
 {
   "scripts": {
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "type-check": "tsc --noEmit",
-    "quality:check": "npm run lint && npm run prettier && npm run type-check",
-    "quality:fix": "npm run lint:fix && npm run prettier:fix"
+    "quality:check": "pnpm run lint && pnpm run prettier && pnpm run type-check",
+    "quality:fix": "pnpm run lint:fix && pnpm run prettier:fix"
   }
 }
 ```
@@ -647,7 +634,7 @@ module.exports = {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.oxlint": true
   },
   "typescript.preferences.importModuleSpecifier": "relative",
   "javascript.preferences.importModuleSpecifier": "relative"
@@ -656,7 +643,7 @@ module.exports = {
 
 ### 5.5 Règles spécifiques au projet
 ```javascript
-// .eslintrc.js - Règles personnalisées
+// oxlint.config.js - Règles personnalisées
 module.exports = {
   // ...existing config
   rules: {
@@ -741,7 +728,7 @@ module.exports = {
     "hooks": {
       "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-push": "npm run test && npm run type-check"
+      "pre-push": "pnpm run test && pnpm run type-check"
     }
   }
 }
@@ -753,7 +740,7 @@ module.exports = {
 {
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
+      "oxlint --fix",
       "prettier --write",
       "git add"
     ],
@@ -783,7 +770,7 @@ refactor(shared): extract common button component
 docs(readme): update installation instructions
 
 # Configuration
-chore(config): update eslint rules for accessibility
+chore(config): update oxlint rules for accessibility
 
 # Performance
 perf(grid): optimize grid rendering performance
@@ -843,8 +830,8 @@ git add src/features/communications/components/ContactButton/ContactButton.tsx
 git commit -m "refactor(communications): optimize contact button performance"
 
 # 3. Tests et qualité
-npm run test
-npm run quality:check
+pnpm run test
+pnpm run quality:check
 
 # 4. Push et PR
 git push origin feat/communications-contact-button
